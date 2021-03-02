@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 public class DiceGame {
     private final List<Player> players = new ArrayList<>();
     private final List<Die> dice = new ArrayList<>();
-    private final int maxRolls= 0;
+    private final int maxRolls= 5;
     private Player currentPlayer;
 
     public DiceGame(int countPlayers, int countDice, int MaxRolls){
@@ -30,7 +30,7 @@ public class DiceGame {
     }
 
     private boolean allDiceHeld() {
-     return dice.stream().allMatch(Die::isBeingHeld);
+        return dice.stream().allMatch(Die::isBeingHeld);
     }
 
     public boolean autoHold(int faceValue) {
@@ -50,8 +50,9 @@ public class DiceGame {
      }
     }
 
+    //how do we send variable in like countDice instead of 5?
     public boolean currentPlayerCanRoll(){
-     if (currentPlayer.getRollsUsed() > 0 && !allDiceHeld()){
+    if (currentPlayer.getRollsUsed() < 5 && !allDiceHeld()){
       return true;
      }
      else {
@@ -80,12 +81,11 @@ public class DiceGame {
     //Comparator.comparingInt, reversed, forEach, map, Collectors.joining
     public String getGameResults() {
         Stream<Player> result = players.stream().
-                sorted(Comparator.comparingInt(Player::getScore)).
-                sorted(Collections.reverseOrder());
+                sorted(Comparator.comparingInt(Player::getScore).reversed());
         Optional<Player> highScorePlayer = result.findFirst();
         highScorePlayer.get().addWin();
 
-        //try using skip(1) to jump past the first one that we just assigned a win to. this doesn't appear to work.
+        //does skip actually work for this?
         players.stream().skip(1).forEach(Player::addLoss);
         return players.stream().map(Player::toString).collect(Collectors.joining());
     }
@@ -101,9 +101,10 @@ public class DiceGame {
       }
     }
 
+
     public boolean nextPlayer(){
-     if (currentPlayer.getPlayerNumber() < players.size()-1){
-      currentPlayer = players.get(currentPlayer.getPlayerNumber() + 1);
+     if (currentPlayer.getPlayerNumber() < players.size()){
+      currentPlayer = players.get(currentPlayer.getPlayerNumber());
       return true;
      }
      else {
@@ -111,7 +112,7 @@ public class DiceGame {
      }
      }
 
-
+    //filter, findfirst, ispresent
     public void playerHold(char dieNum){
      Stream<Die> holdStream = dice.stream().filter(die -> die.getDieNum()==dieNum);
      Optional<Die> result = holdStream.findFirst();
@@ -134,26 +135,29 @@ public class DiceGame {
     }
 
     public void scoreCurrentPlayer(){
-     List<Integer> poppedDie = new ArrayList<>();
-     List<Integer> scoringDie = new ArrayList<>();
-     for (Die d : dice) {
-      if (d.getFaceValue() == 6 && !poppedDie.contains(6) || d.getFaceValue() == 5 && !poppedDie.contains(5) || d.getFaceValue() == 4 && !poppedDie.contains(4)){
-       poppedDie.add(d.getFaceValue());
-      }
-      else {
-       scoringDie.add(d.getFaceValue());
-      }
-     }
+        //this first line confirms that all dice are held, so that it doesn't just jump to it and return nothing.
+        //if (allDiceHeld() && isHoldingDie(6) && isHoldingDie(5) && isHoldingDie(4)){
+            List<Integer> poppedDie = new ArrayList<>();
+            List<Integer> scoringDie = new ArrayList<>();
+            for (Die d : dice) {
+                if (d.getFaceValue() == 6 && !poppedDie.contains(6) || d.getFaceValue() == 5 && !poppedDie.contains(5) || d.getFaceValue() == 4 && !poppedDie.contains(4)){
+                    poppedDie.add(d.getFaceValue());
+                }
+                else {
+                    scoringDie.add(d.getFaceValue());
+                }
+            }
 
-     int totalScore = 0;
+            int totalScore = 0;
 
-     //only fires if poppedDie has ship, captain, and crew
-     if (poppedDie.contains(6) & poppedDie.contains(5) && poppedDie.contains(4)){
-      for (Integer i : scoringDie){
-       totalScore = totalScore + i;
-      }
-     }
-     currentPlayer.setScore(getCurrentPlayerScore()+totalScore);
+            //only fires if poppedDie has ship, captain, and crew
+            if (poppedDie.contains(6) & poppedDie.contains(5) && poppedDie.contains(4)){
+                for (Integer i : scoringDie){
+                    totalScore = totalScore + i;
+                }
+            }
+            currentPlayer.setScore(getCurrentPlayerScore()+totalScore);
+        //}
     }
 
 
