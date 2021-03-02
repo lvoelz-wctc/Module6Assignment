@@ -83,25 +83,20 @@ public class DiceGame {
         Stream<Player> result = players.stream().
                 sorted(Comparator.comparingInt(Player::getScore).reversed());
 
-        /**Original Logic
-        Optional<Player> highScorePlayer = result.findFirst();
-        highScorePlayer.get().addWin();
-        **/
-
-        /**New Logic. This is better but won't handle when all players tie.**/
         List<Player> sortedPlayerList = result.collect(Collectors.toList());
         int count = 0;
 
         int winValue = sortedPlayerList.get(0).getScore();
-        for (Player player : sortedPlayerList) {
-            if (player.getScore() == winValue) {
-                player.addWin();
-                count = count+1;
+        if (winValue != 0){
+            for (Player player : sortedPlayerList) {
+                if (player.getScore() == winValue) {
+                    player.addWin();
+                    count = count+1;
+                }
+                else {player.addLoss();}
             }
         }
-
-        players.stream().skip(count).forEach(Player::addLoss);
-        return players.stream().map(Player::toString).collect(Collectors.joining());
+        return sortedPlayerList.stream().map(Player::toString).collect(Collectors.joining());
     }
 
     private boolean isHoldingDie(int faceValue){
