@@ -34,20 +34,20 @@ public class DiceGame {
     }
 
     public boolean autoHold(int faceValue) {
-    Stream<Die> filteredList = dice.stream().filter(die -> die.getFaceValue()==faceValue); //reduces to stream of only these values
-     Optional<Die> result = filteredList.findFirst();
-     if (result.isPresent()){
-      if (!result.get().isBeingHeld()){
-       result.get().holdDie();
-       return true;
-      }
-      else {
-       return true;
-      }
-      }
-     else {
-      return false;
-     }
+    if (isHoldingDie(faceValue)){
+        return true;
+    }
+    else {
+        Stream<Die> filteredList = dice.stream().filter(die -> die.getFaceValue()==faceValue); //reduces to stream of only these values
+        Optional<Die> result = filteredList.findFirst();
+        if (result.isPresent()){
+            if (!result.get().isBeingHeld()){
+                result.get().holdDie();
+                return true;
+            }
+        }
+        return false;
+    }
     }
 
     //how do we send variable in like countDice instead of 5?
@@ -100,7 +100,7 @@ public class DiceGame {
     }
 
     private boolean isHoldingDie(int faceValue){
-     Stream<Die> filteredList = dice.stream().filter(die -> die.getFaceValue()==faceValue);
+     Stream<Die> filteredList = dice.stream().filter(die -> die.getFaceValue()==faceValue).filter(Die::isBeingHeld);
      Optional<Die> result = filteredList.findFirst();
       if (result.isPresent()){
        return true;

@@ -52,7 +52,7 @@ public class Player {
     }
 
     public String toString() {
-        return String.format("edu.wctc.Player %d: %d (Won: %d, Lost: %d)",
+        return String.format("Player %d: %d (Won: %d, Lost: %d)",
                 playerNum, score, countWin, countLoss);
     }
 }
